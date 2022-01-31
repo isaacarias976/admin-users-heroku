@@ -1,0 +1,166 @@
+<div class="container">
+
+  <br>
+  <h2>Empleados</h2>
+  <br>
+
+  <!-- Form Add usuario -->
+  <mat-card class="example-card">
+    <mat-card-header>
+      <mat-card-title>Datos del empleado</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="col">
+        <div class="row">
+          <div class="col-sm-6">
+              <label>BRM</label>
+              <input [(ngModel)]="user.brm" type="number" class="form-control" placeholder="BRM" aria-label="brm" aria-describedby="basic-addon1">
+          </div>
+          <div class="col-sm-6">
+              <label>Puesto</label>
+              <select [(ngModel)]="user.puesto" class="form-select" aria-label="Default select example">
+                <option selected>Selecciona un puesto</option>
+                <option value="Programador Jr">Programador Jr</option>
+                <option value="Programador Sr">Programador Sr</option>
+              </select>
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-sm-6">
+            <label>Nombre</label>
+            <input [(ngModel)]="user.nombre" type="text" class="form-control" placeholder="Nombre" aria-label="nombre" aria-describedby="basic-addon1">
+          </div>
+          <div class="col-sm-6">
+            <div class="row">
+              <div [ngClass]="base64 === '' ? 'col-sm-12' : 'col-sm-9'" class="col-sm-9">
+                <label>Imagen de perfil</label>
+                <div class="input-group">
+                  <div class="input-group">
+                    <input (change)="setImg($event)" type="file" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-3" *ngIf="base64 !== '' else elseBlock">
+                  <img [src]="base64" class="img-fluid rounded " alt="...">
+              </div>
+              <ng-template #elseBlock>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-sm-2">
+            <button [disabled]="loading" type="button" class="btn btn-outline-primary" (click)="addUser()">Agregar</button>
+          </div>
+          <div class="col-sm-1">
+            <h5 *ngIf="loading">Guardando...</h5>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <br>
+
+  <!-- Tabla-->
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource">
+  
+      <ng-container matColumnDef="brm">
+        <th mat-header-cell *matHeaderCellDef> BRM </th>
+        <td mat-cell *matCellDef="let element"> {{element.brm}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef> Nombre </th>
+        <td mat-cell *matCellDef="let element"> {{element.nombre}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="puesto">
+        <th mat-header-cell *matHeaderCellDef> Puesto </th>
+        <td mat-cell *matCellDef="let element"> {{element.puesto}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="img">
+        <th mat-header-cell *matHeaderCellDef> Imagen </th>
+        <td mat-cell *matCellDef="let element">{{element.img}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Acciones </th>
+          <td mat-cell *matCellDef="let element">
+            <button id="showEditBtn" type="button" (click)="setEditUser(element)" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Editar
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="deleteUser(element.id)">
+                Eliminar
+            </button>
+          </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    </table>
+    <mat-paginator [pageSizeOptions]="[5]" showFirstLastButtons></mat-paginator>
+  </div>
+
+  <!-- Modal Edit-->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Editar usuario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="row">
+                    <img [src]="userEdit.base64" class="img-fluid rounded " alt="...">
+                </div>
+                <br>
+                <div class="row">
+                    <input (change)="setImgEdit($event)" type="file" class="form-control" id="fileEdit" aria-describedby="fileEditDes" aria-label="Upload">
+                </div>
+              </div>
+              <div class="col-sm-1"></div>
+              <div class="col-sm-7">
+                <div class="row">
+                  <div id="alertPlaceholder"></div>
+                </div>
+                <div class="row">
+                  <label>BRM</label>
+                  <input [(ngModel)]="userEdit.brm" type="text" class="form-control" placeholder="BRM" aria-label="brm-edit" aria-describedby="basic-addon1">
+                </div>
+                <div class="row">
+                  <label>Nombre</label>
+                  <input [(ngModel)]="userEdit.nombre" type="text" class="form-control" placeholder="Nombre" aria-label="nombre-edit" aria-describedby="basic-addon1">
+                </div>
+                <div class="row">
+                  <label>Puesto</label>
+                  <select [(ngModel)]="userEdit.puesto" class="form-select" aria-label="Default select example">
+                    <option selected>Selecciona un puesto</option>
+                    <option value="Programador Jr">Programador Jr</option>
+                    <option value="Programador Sr">Programador Sr</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" (click)="updateUser(userEdit)">Guardar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
